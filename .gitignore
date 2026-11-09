@@ -1,0 +1,31 @@
+# environments, caches
+.venv/
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+.claude/
+
+# YOUR data: library database, contacts, settings, backups (never commit these)
+db/*.sqlite
+db/*.sqlite-*
+db/*.bak*
+db/settings.json
+
+# audio files (yours, and the generated demo audio)
+*.mp3
+*.wav
+*.m4a
+*.flac
+*.aif
+*.aiff
+*.ogg
+*.opus
+*.aac
+demo_audio/
+
+# the original v1 web app (superseded by audio-web-v2, which includes the converter); has its own nested .git
+audio-web/
+
+# personal notes
+*.rtf

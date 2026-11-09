@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audio Converter v2 — Library</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="v2.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Audio Converter<small>v2</small></div>
+    <nav><a class="active" href="index.html">Library</a><a href="convert.html">Convert</a></nav>
+    <div class="stats" id="stats"></div>
+    <button class="btn-primary" id="open-import" type="button">＋ Import folder</button>
+  </header>
+
+  <div class="lib">
+    <aside class="side">
+      <h3>Type</h3>
+      <div class="seg" id="type-seg">
+        <button data-type="" class="on">All</button><button data-type="loop">Loops</button>
+        <button data-type="one-shot">Hits</button><button data-type="track">Tracks</button>
+      </div>
+      <h3>BPM</h3>
+      <div class="row"><input id="bpm-min" type="number" min="30" max="300" placeholder="min"><input id="bpm-max" type="number" min="30" max="300" placeholder="max"></div>
+      <h3>Sound analysis</h3>
+      <div class="analysis" id="analysis"><span class="muted">Checking…</span></div>
+      <h3>Organize</h3>
+      <label class="check"><input type="checkbox" id="stack" checked> Stack versions of the same track</label>
+      <div class="row" style="margin-top:8px"><select id="sent" aria-label="Sent filter"><option value="">Sent: any</option><option value="never">Never sent</option><option value="sent">Already sent</option></select></div>
+      <div class="orgbtns"><button type="button" id="open-genres">◐ Genres</button><button type="button" id="open-people">✉ People &amp; sends</button><button type="button" id="open-versions">⧉ Review stacks</button></div>
+      <h3>Key &amp; rating</h3>
+      <div class="row"><select id="key"><option value="">Any key</option></select>
+        <select id="rating"><option value="">Any ★</option><option value="1">★ 1+</option><option value="2">★ 2+</option><option value="3">★ 3+</option><option value="4">★ 4+</option><option value="5">★ 5</option></select></div>
+      <p class="hint" id="key-hint" hidden></p>
+      <h3>Smart searches</h3>
+      <div id="saved"></div>
+      <button class="add-coll" id="save-search" type="button">★ Save current search</button>
+      <h3>Collections</h3>
+      <div id="collections"></div>
+      <button class="add-coll" id="new-coll" type="button">+ New collection</button>
+      <h3>Tags <button class="linkish" id="manage-tags" type="button">manage</button></h3>
+      <div id="facets"></div>
+    </aside>
+
+    <main class="main">
+      <div class="searchwrap">
+        <div class="searchbox">
+          <span class="mag">⌕</span>
+          <input id="q" type="search" autocomplete="off" spellcheck="false"
+                 placeholder="Try “dark piano 140”, “trap 2024”, a track name, or just a tempo…" aria-label="Search your library">
+          <div class="suggest" id="suggest" role="listbox" hidden></div>
+        </div>
+        <button class="mimic-btn" id="open-mimic" type="button" title="Hum, tap, or drop in a sound to find tracks that sound like it">◉ Search by sound</button>
+      </div>
+      <div class="viewpills" id="viewpills"><button data-view="home" class="on">Discover</button><button data-view="browse">All tracks</button></div>
+      <div class="chips" id="chips"></div>
+      <div class="notes" id="notes"></div>
+      <div class="chips" id="alts"></div>
+      <div class="simbar" id="simbar" hidden></div>
+
+      <div class="onboard" id="onboard" hidden>
+        <h2>Let’s build your library</h2>
+        <p>Point the app at a folder of audio. It scans, tags and organizes everything in place — your files are never moved, renamed or changed.</p>
+        <button class="btn-primary" id="onboard-import" type="button">Choose a folder to import</button>
+      </div>
+
+      <div class="batchbar" id="batchbar" hidden>
+        <b id="sel-count"></b>
+        <button type="button" id="b-edit">Edit…</button>
+        <button type="button" id="b-coll">＋ Collection</button>
+        <button type="button" id="b-sent" title="Log that you sent these tracks to someone">✉ Mark sent…</button>
+        <button type="button" id="b-group" title="Treat the selected tracks as versions of one track">⧉ Group</button>
+        <button type="button" id="b-analyze" title="Analyze the sound of the selected tracks">Analyze sound</button>
+        <button type="button" id="b-all">Select all loaded</button>
+        <button type="button" id="b-clear">Clear</button>
+      </div>
+
+      <div id="home" hidden></div>
+      <div class="bar">
+        <span id="count"></span>
+        <select id="sort" aria-label="Sort">
+          <option value="relevance">Best match</option><option value="name">Name</option><option value="bpm">BPM</option>
+          <option value="duration">Length</option><option value="newest">Newest added</option><option value="random">Shuffle</option>
+        </select>
+      </div>
+      <div id="results"></div>
+      <button class="more" id="more" type="button" hidden>Load more</button>
+    </main>
+  </div>
+
+  <!-- Track inspector: edit one track's attributes -->
+  <aside class="inspector" id="inspector" hidden aria-label="Track details"></aside>
+
+  <!-- Import wizard -->
+  <dialog id="import-dlg" class="dlg">
+    <div class="dlg-head"><h2 id="imp-title">Import audio</h2><button class="x" data-close aria-label="Close">×</button></div>
+    <div id="imp-body"></div>
+  </dialog>
+
+  <!-- Batch edit -->
+  <dialog id="batch-dlg" class="dlg">
+    <div class="dlg-head"><h2 id="batch-title">Edit tracks</h2><button class="x" data-close aria-label="Close">×</button></div>
+    <form id="batch-form" class="form">
+      <p class="muted">Only fields you fill in change. Originals are never touched, and you can undo right after.</p>
+      <label>Add tags <input name="add" list="tag-list" placeholder="e.g. dark, 808, drill"></label>
+      <label>Remove tags <input name="remove" list="tag-list" placeholder="e.g. demo"></label>
+      <div class="form-row">
+        <label>Type <select name="sample_type"><option value="">— keep —</option><option>loop</option><option>one-shot</option><option>track</option></select></label>
+        <label>BPM <input name="bpm" type="number" min="30" max="300" step="0.1" placeholder="keep"></label>
+        <label>Key <input name="key" placeholder="8A or A minor"></label>
+        <label>Rating <select name="rating"><option value="">— keep —</option><option value="0">clear</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+      </div>
+      <label>Add to collection <input name="collection" list="coll-list" placeholder="existing or new name"></label>
+      <p class="error" id="batch-err"></p>
+      <div class="dlg-foot"><button type="button" data-close>Cancel</button><button class="btn-primary" type="submit" id="batch-go">Apply</button></div>
+    </form>
+  </dialog>
+
+  <!-- Tag manager -->
+  <dialog id="tagmgr-dlg" class="dlg">
+    <div class="dlg-head"><h2>Manage tags</h2><button class="x" data-close aria-label="Close">×</button></div>
+    <input id="tagmgr-filter" placeholder="Filter tags…" class="full">
+    <div id="tagmgr-list" class="tagmgr"></div>
+  </dialog>
+
+  <!-- Search by sound (Mimic) -->
+  <dialog id="mimic-dlg" class="dlg">
+    <div class="dlg-head"><h2>Search by sound</h2><button class="x" data-close aria-label="Close">×</button></div>
+    <p class="muted">Hum, beatbox, tap a rhythm, or drop in any audio clip. You get the tracks in your library that sound closest — by tone, brightness, energy and tempo. It doesn’t match melodies note for note.</p>
+    <div class="rec"><button class="recbtn" id="rec-btn" type="button" aria-label="Record">●</button><div><b id="rec-title">Record up to 8 seconds</b><div class="muted" id="rec-status">Your browser will ask for microphone access.</div></div></div>
+    <div class="drop" id="drop-clip">…or drop an audio clip here, or click to choose a file<input id="clip-file" type="file" accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg,.aac,.webm" hidden></div>
+    <p class="error" id="mimic-err"></p>
+  </dialog>
+
+  <dialog id="genres-dlg" class="dlg wide"><div class="dlg-head"><h2>Genres</h2><button class="x" data-close aria-label="Close">×</button></div><div id="genres-body"></div></dialog>
+  <dialog id="people-dlg" class="dlg wide"><div class="dlg-head"><h2 id="people-title">People &amp; sends</h2><button class="x" data-close aria-label="Close">×</button></div><div id="people-body"></div></dialog>
+  <dialog id="versions-dlg" class="dlg wide"><div class="dlg-head"><h2>Stacked versions</h2><button class="x" data-close aria-label="Close">×</button></div><div id="versions-body"></div></dialog>
+
+  <datalist id="tag-list"></datalist><datalist id="coll-list"></datalist>
+  <div class="player" id="player" hidden>
+    <button class="play" id="p-btn" type="button" aria-label="Play / pause">▶</button>
+    <div><div class="ptitle" id="p-title"></div><input id="p-seek" type="range" min="0" max="1000" value="0"><div class="perr" id="p-err"></div></div>
+    <div class="pt" id="p-time">0:00</div>
+  </div>
+  <div class="toast2" id="toast2" hidden></div>
+  <script src="library.js"></script>
+  <script src="extras.js"></script>
+</body>
+</html>

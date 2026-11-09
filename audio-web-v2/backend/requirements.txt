@@ -1,0 +1,8 @@
+# Tested with Python 3.9 on macOS (Apple silicon). Also needs the ffmpeg command-line tool (brew install ffmpeg / apt install ffmpeg).
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
+mutagen>=1.47
+numpy>=1.26
+librosa>=0.10
+soundfile>=0.12

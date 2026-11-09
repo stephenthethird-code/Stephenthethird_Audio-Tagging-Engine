@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audio Converter</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="v2.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Audio Converter<small>v2</small></div>
+    <nav><a href="index.html">Library</a><a class="active" href="convert.html">Convert</a></nav>
+  </header>
+  <main class="container">
+    <h1>Audio Converter</h1>
+    <p class="subtitle">Drop a file to see its details, then convert it to another format.</p>
+
+    <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Choose an audio file">
+      <div class="dropzone-icon">&#8679;</div>
+      <p class="dropzone-title">Drag &amp; drop an audio file here</p>
+      <p class="dropzone-hint">or click to browse</p>
+      <input id="file-input" type="file" accept="audio/*,.mp3,.wav,.flac,.ogg,.m4a,.aac,.aiff,.aif,.opus,.wma" hidden>
+    </div>
+
+    <p id="status" class="status" role="status"></p>
+
+    <div class="grid-toolbar">
+      <button id="copy-all-btn" class="btn-secondary" type="button" disabled>Copy all metadata</button>
+    </div>
+
+    <section class="grid">
+      <div class="box">
+        <div class="box-head">
+          <h2>Filename</h2>
+          <button class="copy-btn" type="button" data-copy="filename" aria-label="Copy filename" disabled>Copy</button>
+        </div>
+        <p id="out-filename" class="value">—</p>
+      </div>
+      <div class="box">
+        <div class="box-head">
+          <h2>Duration</h2>
+          <button class="copy-btn" type="button" data-copy="duration" aria-label="Copy duration" disabled>Copy</button>
+        </div>
+        <p id="out-duration" class="value">—</p>
+      </div>
+      <div class="box">
+        <div class="box-head">
+          <h2>BPM</h2>
+          <button class="copy-btn" type="button" data-copy="bpm" aria-label="Copy BPM" disabled>Copy</button>
+        </div>
+        <p id="out-bpm" class="value">—</p>
+      </div>
+      <div class="box">
+        <div class="box-head">
+          <h2>Key</h2>
+          <button class="copy-btn" type="button" data-copy="key" aria-label="Copy key" disabled>Copy</button>
+        </div>
+        <p id="out-key" class="value">—</p>
+      </div>
+      <div class="box box-wide">
+        <div class="box-head">
+          <h2>Tags</h2>
+          <button class="copy-btn" type="button" data-copy="tags" aria-label="Copy tags" disabled>Copy</button>
+        </div>
+        <dl id="out-tags" class="tags"><p class="value">—</p></dl>
+      </div>
+    </section>
+
+    <section class="convert">
+      <div class="convert-row">
+        <label for="format">Convert to</label>
+        <select id="format">
+          <option value="wav">WAV</option>
+          <option value="mp3" selected>MP3</option>
+          <option value="m4a">M4A</option>
+          <option value="flac">FLAC</option>
+          <option value="ogg">OGG</option>
+          <option value="aac">AAC</option>
+        </select>
+        <div class="presets" role="group" aria-label="Format presets">
+          <button class="preset" type="button" data-format="mp3" data-bitrate="320k">DJ: 320k MP3</button>
+          <button class="preset" type="button" data-format="flac">Lossless: FLAC</button>
+          <button class="preset" type="button" data-format="mp3" data-bitrate="192k">Light: 192k MP3</button>
+        </div>
+      </div>
+
+      <div class="template-row">
+        <label for="naming-template">Naming template</label>
+        <input id="naming-template" type="text" value="{name}_{bpm}bpm_{key}.{ext}" spellcheck="false" autocomplete="off">
+        <p class="template-hint">Placeholders: {name} {bpm} {key} {ext}</p>
+        <div class="preview">
+          <span class="preview-label">Preview</span>
+          <output id="name-preview" class="preview-value" for="naming-template format">—</output>
+        </div>
+      </div>
+
+      <button id="convert-btn" type="button" disabled>Convert</button>
+    </section>
+
+    <section class="history">
+      <h2>Recent tracks</h2>
+      <ul id="history-list" class="history-list">
+        <li class="history-empty">Nothing yet. Tracks you analyze or convert this session show up here.</li>
+      </ul>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite">Copied!</div>
+
+  <script src="convert.js"></script>
+</body>
+</html>
