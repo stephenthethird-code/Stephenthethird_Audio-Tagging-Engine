@@ -107,4 +107,4 @@ watch folders · a learned audio embedding for better similarity.
 ## Credits
 
 Inspired by the organization and search ideas of sample managers such as Sononym and Loopcloud; this is an independent implementation.
-License: _to be decided by the author_.
+License: [MIT](LICENSE).
